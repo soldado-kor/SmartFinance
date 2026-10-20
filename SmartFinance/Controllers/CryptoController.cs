@@ -66,19 +66,23 @@ public class CryptoController : ControllerBase
     public IActionResult Insights(string symbol)
     {
         var data = _repo.GetBySymbol(symbol.ToLower());
-
-        var result = _analyzer.Analyze(data);
-
+        AnalysisResult result;
+        try{
+            result = _analyzer.Analyze(data);
+        }
+        catch (InvalidCryptoPriceException e){
+            return StatusCode(500, e.Message);
+        }
         return Ok(new AnalysisResponseDTO
-    {
-        Trend = result.Trend,
-        ChangePercent = result.ChangePercent,
-        HighestPrice = result.HighestPrice,
-        HighestPriceTimestamp = result.HighestPriceTimestamp,
-        LowestPrice = result.LowestPrice,
-        LowestPriceTimestamp = result.LowestPriceTimestamp
-    });
-    }
+        {
+            Trend = result.Trend,
+            ChangePercent = result.ChangePercent,
+            HighestPrice = result.HighestPrice,
+            HighestPriceTimestamp = result.HighestPriceTimestamp,
+            LowestPrice = result.LowestPrice,
+            LowestPriceTimestamp = result.LowestPriceTimestamp
+        });
+        }
 
      [HttpGet("analysis/{symbol}")]
 
@@ -98,9 +102,13 @@ public class CryptoController : ControllerBase
         {
             return NotFound($"No data found for symbol {symbol} in the last {days} days.");
         }
-
-        var result = _analyzer.Analyze(data);
-
+        AnalysisResult result;
+        try{
+            result = _analyzer.Analyze(data);
+        }
+        catch (InvalidCryptoPriceException e){
+            return StatusCode(500, e.Message);
+        }
         return Ok(new AnalysisResponseDTO
         {
             Trend = result.Trend,

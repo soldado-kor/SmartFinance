@@ -1,4 +1,5 @@
 using SmartFinance.Models;
+using SmartFinance.Exceptions;
 using SmartFinance.DTOs;
 
 namespace SmartFinance.Analyzers;
@@ -11,6 +12,11 @@ public class StockAnalyzer
         if (prices == null || prices.Count < 2)
         {
             return new AnalysisResult { Trend = "UNKNOWN" };
+        }
+
+        if(prices.Any(x => x.Price <= 0))
+        {
+            throw new InvalidCryptoPriceException();
         }
 
         var first = prices.First();

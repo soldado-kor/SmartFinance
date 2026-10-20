@@ -111,15 +111,20 @@ The current implementation focuses on Bitcoin and can be extended to support add
 
 ## Testing
 
-The project includes unit tests for the `StockAnalyzer` business logic.
+The project includes unit tests for the StockAnalyzer business logic.
 
-The tests cover the identified analysis outcomes and edge cases, including:
+The tests cover the following scenarios:
 
-- `UP`
-- `DOWN`
-- `STABLE`
-- insufficient input data
-- null input
+- UP, DOWN and STABLE trends
+- Insufficient or empty input data
+- Null input
+- Zero or negative cryptocurrency prices
+
+### Price validation
+
+The StockAnalyzer throws an `InvalidCryptoPriceException` when any price is less than or equal to zero.
+
+The API controller catches this exception and returns an HTTP 500 response.
 
 ## Getting Started
 
