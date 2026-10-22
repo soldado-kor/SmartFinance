@@ -32,6 +32,7 @@ SmartFinance is a tool for collecting cryptocurrency price data, storing it in a
 
 **Testing & Documentation**
 - xUnit
+- ASP.NET Core WebApplicationFactory
 - Swagger / OpenAPI
 
 **Version Control**
@@ -49,49 +50,47 @@ The application follows a layered architecture with clear separation of responsi
 - **DTOs** define the data exposed through the API.
 - **BackgroundJobs** periodically collect Bitcoin price data and store it in the database.
 
-A typical analysis request follows this flow:
+The following diagram illustrates the request flow for the historical insights endpoint:
 
-~~~text
+```text
 Client
   ↓
-Controller
+CryptoController (Insights)
   ↓
-Repository
-  ↓
-SQLite
+Repository ↔ SQLite
   ↓
 StockAnalyzer
   ↓
 AnalysisResult
   ↓
-AnalysisResponseDto
+AnalysisResponseDTO
   ↓
-HTTP Response
-~~~
+HTTP 200 OK
+```
 
 ## API Endpoints
 
 ### Synchronize cryptocurrency price
 
-~~~http
+```http
 POST /api/crypto/sync
-~~~
+```
 
 Fetches the current price of the selected cryptocurrency from CoinGecko and stores it in the database.
 
 ### Historical insights
 
-~~~http
+```http
 GET /api/crypto/insights/{symbol}
-~~~
+```
 
 Analyzes all available historical data for the selected cryptocurrency.
 
 ### Time-range analysis
 
-~~~http
+```http
 GET /api/crypto/analysis/{symbol}?days=30
-~~~
+```
 
 Analyzes cryptocurrency price data within a user-defined time window.
 
@@ -167,47 +166,56 @@ The current test suite contains 16 tests, all passing.
 
 ### Running the application
 
-1. Clone the repository.
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/soldado-kor/SmartFinance.git
+   ```
+
 2. Navigate to the repository directory.
+    ```bash
+    cd SmartFinance
+    ```
 3. Build the solution:
 
-~~~bash
+```bash
 dotnet build SmartFinance.sln
-~~~
+```
 
 4. Run the application:
 
-~~~bash
+```bash
 dotnet run --project SmartFinance/SmartFinance.csproj
-~~~
+```
 
 5. Open Swagger:
 
-~~~text
+```text
 http://localhost:5150/swagger
-~~~
+```
 
 ## Example Requests
 
 ### Synchronize cryptocurrency price
 
-~~~http
+```http
 POST /api/crypto/sync
 Content-Type: application/json
 
 {
   "symbol": "BTC"
 }
-~~~
+```
 
 ### Analyze all available historical data
 
-~~~http
+```http
 GET /api/crypto/insights/ETH
-~~~
+```
+
+> Note: Ensure that sufficient ETH price records have been collected using the sync endpoint before requesting historical insights.
 
 ### Analyze a specific time window
 
-~~~http
+```http
 GET /api/crypto/analysis/BTC?days=30
-~~~
+```
