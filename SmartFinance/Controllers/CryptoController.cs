@@ -66,6 +66,10 @@ public class CryptoController : ControllerBase
     public IActionResult Insights(string symbol)
     {
         var data = _repo.GetBySymbol(symbol.ToLower());
+        if (data.Count == 0)
+        {
+            return NotFound("No price history found for this cryptocurrency.");
+        }
         AnalysisResult result;
         try{
             result = _analyzer.Analyze(data);

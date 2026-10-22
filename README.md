@@ -111,9 +111,11 @@ The current implementation focuses on Bitcoin and can be extended to support add
 
 ## Testing
 
-The project includes unit tests for the StockAnalyzer business logic.
+The project includes unit and integration tests using xUnit.
 
-The tests cover the following scenarios:
+### Unit tests
+
+Unit tests cover the `StockAnalyzer` business logic and the following scenarios:
 
 - UP, DOWN and STABLE trends
 - Insufficient or empty input data
@@ -122,9 +124,40 @@ The tests cover the following scenarios:
 
 ### Price validation
 
-The StockAnalyzer throws an `InvalidCryptoPriceException` when any price is less than or equal to zero.
+The `StockAnalyzer` throws an `InvalidCryptoPriceException` when any price is less than or equal to zero.
 
 The API controller catches this exception and returns an HTTP 500 response.
+
+### Integration tests
+
+Integration tests cover the `CryptoController` API endpoints using `WebApplicationFactory`.
+
+The tests verify:
+
+- HTTP 200 responses and returned analysis data for valid requests
+- HTTP 404 responses when no price data is available
+- HTTP 400 responses for invalid parameters and unsupported symbols
+- HTTP 500 responses when invalid price data causes an analysis error
+- Trend calculations, percentage changes, and highest and lowest prices
+
+Each test factory instance uses an isolated temporary SQLite database. SQLite connection pooling is disabled in the test configuration to allow reliable cleanup of temporary database files.
+
+### Running tests
+
+Run all tests from the solution directory:
+
+```bash
+dotnet test
+```
+
+Build the project:
+
+```bash
+dotnet build
+```
+
+The current test suite contains 16 tests, all passing.
+
 
 ## Getting Started
 

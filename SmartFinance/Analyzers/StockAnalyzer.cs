@@ -7,7 +7,7 @@ namespace SmartFinance.Analyzers;
 
 public class StockAnalyzer
 {
-    public AnalysisResult Analyze(List<CryptoPrice> prices)
+    public AnalysisResult Analyze(List<CryptoPrice>? prices)
     {
         if (prices == null || prices.Count < 2)
         {
