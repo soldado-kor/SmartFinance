@@ -9,6 +9,8 @@ SmartFinance is a tool for collecting cryptocurrency price data, storing it in a
 - Performs analysis over a user-defined time window.
 - Calculates percentage price change, highest and lowest prices, and their timestamps.
 - Periodically collects Bitcoin price data in the background.
+- Supports containerized deployment using Docker and Docker Compose.
+- Persists SQLite database data across container recreations using a named Docker volume.
 
 ## Tech Stack
 
@@ -26,6 +28,10 @@ SmartFinance is a tool for collecting cryptocurrency price data, storing it in a
 - Dependency Injection
 - Repository Pattern
 - BackgroundService
+
+**Containerization & Deployment**
+- Docker
+- Docker Compose
 
 **External Services**
 - CoinGecko API
@@ -67,6 +73,12 @@ AnalysisResponseDTO
   ↓
 HTTP 200 OK
 ```
+
+### Containerization
+
+The application is containerized using a multi-stage Docker build. The .NET SDK image is used to restore dependencies and publish the application, while the final image uses the ASP.NET Core runtime image.
+
+Docker Compose defines the application service, port mapping, environment variables and a named volume for persistent SQLite database storage.
 
 ## API Endpoints
 
@@ -160,38 +172,89 @@ The current test suite contains 16 tests, all passing.
 
 ## Getting Started
 
-### Prerequisites
+### Running locally
+
+#### Prerequisites
 
 - .NET 10 SDK
 
-### Running the application
+#### Steps
 
 1. Clone the repository:
+
    ```bash
    git clone https://github.com/soldado-kor/SmartFinance.git
    ```
 
-2. Navigate to the repository directory.
-    ```bash
-    cd SmartFinance
-    ```
+2. Navigate to the repository directory:
+
+   ```bash
+   cd SmartFinance
+   ```
+
 3. Build the solution:
 
-```bash
-dotnet build SmartFinance.sln
-```
+   ```bash
+   dotnet build SmartFinance.sln
+   ```
 
 4. Run the application:
 
+   ```bash
+   dotnet run --project SmartFinance/SmartFinance.csproj
+   ```
+
+5. Open Swagger UI:
+
+   ```text
+   http://localhost:5150/swagger
+   ```
+
+### Running with Docker
+
+#### Prerequisites
+
+- Docker Desktop with Docker Compose support
+
+#### Start the application
+
+Run the following command from the repository root:
+
 ```bash
-dotnet run --project SmartFinance/SmartFinance.csproj
+docker compose up --build -d
 ```
 
-5. Open Swagger:
+This builds the Docker image and starts the API container in the background.
+
+Open Swagger UI:
 
 ```text
 http://localhost:5150/swagger
 ```
+
+#### Stop the application
+
+Stop and remove the Compose containers and network:
+
+```bash
+docker compose down
+```
+
+The named Docker volume containing the SQLite database is preserved when running `docker compose down`. This allows the database to persist when the container is recreated.
+
+To remove the database volume as well, use:
+
+```bash
+docker compose down -v
+```
+
+**Warning:** This permanently deletes the database data stored in the Compose-managed volume.
+
+#### Database configuration
+
+The application uses `ConnectionStrings:DefaultConnection` from `appsettings.json` by default. Docker Compose overrides this setting to use `/data/app.db`, stored in the named Docker volume.
+
+Local .NET execution continues to use `app.db` in the application's working directory.
 
 ## Example Requests
 
