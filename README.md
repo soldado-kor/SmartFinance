@@ -11,6 +11,7 @@ SmartFinance is a tool for collecting cryptocurrency price data, storing it in a
 - Periodically collects Bitcoin price data in the background.
 - Supports containerized deployment using Docker and Docker Compose.
 - Persists SQLite database data across container recreations using a named Docker volume.
+- Automated build and unit test execution through GitHub Actions on pushes to `main` and pull requests targeting `main`.
 
 ## Tech Stack
 
@@ -44,6 +45,9 @@ SmartFinance is a tool for collecting cryptocurrency price data, storing it in a
 **Version Control**
 - Git
 - GitHub
+
+**CI/CD**
+- GitHub Actions (continuous integration)
 
 ## Architecture
 
@@ -169,6 +173,15 @@ dotnet build
 
 The current test suite contains 16 tests, all passing.
 
+## Continuous Integration
+
+The project uses GitHub Actions to automatically restore dependencies, build the solution, and run unit tests.
+
+The CI workflow is triggered by:
+- Pushes to the `main` branch.
+- Pull requests targeting the `main` branch.
+
+The workflow runs on a GitHub-hosted Ubuntu runner with the .NET 10 SDK. Build and test results are available in the repository's **Actions** tab and in pull request checks.
 
 ## Getting Started
 
