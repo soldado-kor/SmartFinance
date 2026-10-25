@@ -175,13 +175,25 @@ The current test suite contains 16 tests, all passing.
 
 ## Continuous Integration
 
-The project uses GitHub Actions to automatically restore dependencies, build the solution, and run unit tests.
+The project uses GitHub Actions to automatically validate changes through a CI workflow.
 
-The CI workflow is triggered by:
+The workflow is triggered by:
 - Pushes to the `main` branch.
 - Pull requests targeting the `main` branch.
 
-The workflow runs on a GitHub-hosted Ubuntu runner with the .NET 10 SDK. Build and test results are available in the repository's **Actions** tab and in pull request checks.
+The workflow runs on a GitHub-hosted Ubuntu runner with the .NET 10 SDK and performs the following steps:
+
+1. Restores .NET dependencies.
+2. Builds the solution.
+3. Runs the unit and integration test suite.
+4. Builds the Docker image and starts the application using Docker Compose.
+5. Performs an API smoke test by checking the Swagger/OpenAPI endpoint at `http://localhost:5150/swagger/v1/swagger.json`.
+6. Collects Docker Compose logs if the application startup or readiness check fails.
+7. Stops the Compose services and removes the associated named volume during cleanup.
+
+A failed build, test, or API smoke test causes the workflow to fail. This helps prevent changes that do not pass the configured checks from being merged when the repository's branch protection rules require the CI status check to pass.
+
+Build and test results are available in the repository's **Actions** tab and in pull request checks.
 
 ## Getting Started
 

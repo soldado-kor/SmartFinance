@@ -28,3 +28,28 @@ jobs:
         
       - name: Test
         run: dotnet test SmartFinance.sln --no-build --no-restore
+
+      - name: Start application with Docker Compose
+        id: start_api
+        run: docker compose up --build -d
+
+      - name: Wait for API
+        id: wait_for_api
+        run: |
+          for i in {1..30}; do
+            if curl --fail --silent http://localhost:5150/swagger/v1/swagger.json > /dev/null; then
+              echo "API is up and running."
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "API did not start in time."
+          exit 1
+
+      - name: Show container logs on failure
+        if: failure() && (steps.start_api.outcome == 'failure' || steps.wait_for_api.outcome == 'failure')
+        run: docker compose logs --no-color || true
+
+      - name: Cleanup Docker Compose
+        if: always()
+        run: docker compose down -v --remove-orphans
