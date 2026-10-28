@@ -48,6 +48,7 @@ SmartFinance is a tool for collecting cryptocurrency price data, storing it in a
 
 **CI/CD**
 - GitHub Actions (continuous integration)
+- GitHub Container Registry (GHCR)
 
 ## Architecture
 
@@ -195,6 +196,29 @@ A failed build, test, or API smoke test causes the workflow to fail. This helps 
 
 Build and test results are available in the repository's **Actions** tab and in pull request checks.
 
+### Container Image Publishing
+
+The workflow also publishes the Docker image to GitHub Container Registry (GHCR).
+
+Image publishing runs only on pushes to the `main` branch and only after the `build-and-test` job succeeds. Pull requests run the validation workflow without publishing an image.
+
+The image is published with two tags:
+
+- `sha-<commit>` — identifies a specific source commit.
+- `latest` — points to the latest image published from the default branch.
+
+The image name is:
+
+```text
+ghcr.io/soldado-kor/smartfinance
+```
+
+To pull the published image:
+
+```bash
+docker pull ghcr.io/soldado-kor/smartfinance:latest
+```
+
 ## Getting Started
 
 ### Running locally
@@ -256,6 +280,25 @@ Open Swagger UI:
 ```text
 http://localhost:5150/swagger
 ```
+
+#### Run the published image
+
+To run the prebuilt image from GitHub Container Registry without building it locally:
+
+```bash
+docker compose up -d
+```
+
+Alternatively, pull and run the image directly:
+
+```bash
+docker pull ghcr.io/soldado-kor/smartfinance:latest
+docker run --rm -p 5150:8080 \
+  -e ASPNETCORE_HTTP_PORTS=8080 \
+  ghcr.io/soldado-kor/smartfinance:latest
+```
+
+The direct `docker run` example does not configure persistent SQLite storage. For persistent database data, use the Docker Compose configuration with its named volume.
 
 #### Stop the application
 
